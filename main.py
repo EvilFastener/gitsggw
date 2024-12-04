@@ -1,1 +1,2 @@
-print("s")
+import time
+print(time.time())
