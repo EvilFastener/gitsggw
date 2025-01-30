@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Watch Video{% endblock %}
+
+{% block content %}
+<style>
+    .comment-input {
+        width: 100%;
+        height: 30px;
+        resize: none;
+        padding: 5px;
+        font-size: 14px;
+    }
+
+
+    .comments-section {
+        margin-top: 30px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        width: 500px;
+    }
+
+    .comment-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .comment-item {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+
+    .comment-text {
+        max-width: 100%;
+    }
+
+    .comment-like-form {
+        margin-top: 5px;
+    }
+
+    .like-comment-btn {
+        background-color: #ff4500;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
+
+    .like-comment-btn:hover {
+        background-color: #cc3700;
+    }
+
+    .comment-form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 10px;
+    }
+
+    .comment-input {
+        width: 300px;
+        height: 30px;
+        resize: none;
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .comment-submit {
+        margin-top: 5px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        resize: none;
+    }
+
+    .like-section {
+        margin-top: 20px;
+        padding: 10px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .like-btn {
+        padding: 8px 12px;
+        background-color: #ff4500;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .like-btn:hover {
+        background-color: #cc3700;
+    }
+
+    .back-to-home {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 10px 15px;
+        background-color: #cc0000;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+    }
+
+    .back-to-home:hover {
+        background-color: #990000;
+    }
+
+    .menu-container {
+        margin: 20px auto;
+        max-width: 600px;
+        text-align: center;
+    }
+
+
+    .hidden-section {
+        display: none;
+        margin-top: 20px;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+
+    .toggle-btn {
+        padding: 10px 15px;
+        background-color: #cc0000;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .toggle-btn:hover {
+        background-color: #990000;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .video-wrapper {
+        margin-top: 20px;
+    }
+
+    video {
+        width: 100%;
+        max-height: 450px;
+        border-radius: 8px;
+    }
+</style>
+
+
+<a href="{{ url_for('index') }}" class="back-to-home">Back to Home</a>
+
+
+<div class="menu-container">
+    <button class="toggle-btn" onclick="toggleMenu()">Menu</button>
+
+    <div id="hiddenMenu" class="hidden-section">
+        {% if current_user.is_authenticated %}
+            <p>{{ current_user.username }}</p>
+            <form action="/upload" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+                <label for="video" style="display: block; margin-bottom: 10px;">Upload Video:</label>
+                <input type="file" name="video" id="video" required style="margin-bottom: 20px;">
+                <button type="submit" class="toggle-btn">Upload</button>
+            </form>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                <a href="{{ url_for('logout') }}" class="toggle-btn">Logout</a>
+                <a href="{{ url_for('profile') }}" class="toggle-btn">Profile</a>
+            </div>
+        {% else %}
+            <p>Log in or sign up to upload your own videos.</p>
+            <div class="btn-container">
+                <a href="{{ url_for('login') }}" class="toggle-btn">Login</a>
+                <a href="{{ url_for('register') }}" class="toggle-btn">Register</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="container">
+    <h1>{{ video.filename.rsplit('.', 1)[0] }}</h1>
+
+
+    <div class="video-wrapper">
+        <video controls>
+            <source src="{{ url_for('uploaded_file', filename=video.filename) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+<div class="like-section">
+    <p><strong>Likes:</strong> {{ video.likes|length }}</p>
+
+    {% if current_user.is_authenticated %}
+        <form action="{{ url_for('like_video', video_id=video.id) }}" method="post">
+            <button type="submit" class="btn like-btn">
+            👍 Like ({{ video.likes|length }})
+            </button>
+        </form>
+
+    {% else %}
+        <p style="color: gray;">Log in to like this video</p>
+    {% endif %}
+</div>
+<div class="comments-section">
+
+    <h2>Comments</h2>
+    {% if current_user.is_authenticated %}
+        <form action="{{ url_for('add_comment', video_id=video.id) }}" method="POST" class="comment-form">
+            <textarea name="comment_text" class="comment-input" placeholder="Add a comment..." required></textarea>
+            <button type="submit" class="btn comment-submit">Submit</button>
+        </form>
+    {% else %}
+        <p>You must be logged in to add a comment.</p>
+    {% endif %}
+    <ul class="comment-list">
+        {% for comment in comments %}
+            <li class="comment-item">
+                <div class="comment-text">
+                    <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+                    <small>({{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }})</small>
+                </div>
+
+
+                <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="post" class="comment-like-form">
+                    <button type="submit" class="like-comment-btn">👍 Like ({{ comment.likes|length }})</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+
+</div>
+
+
+
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById("hiddenMenu");
+        menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+    }
+</script>
+
+{% endblock %}
