@@ -2,7 +2,7 @@
  
 Author - Patryk Sitek  
 This project is a web app for uploading videos.  
-It allows to comment and like videos.  
+It allows to upload, comment and like videos.  
 It has built in login system with basic accout customization.  
   
 The project is a summary of the Python course from SGGW.  
